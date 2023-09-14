@@ -1,0 +1,10 @@
+{
+    "editor.fontFamily": "cascadia code",
+    "editor.fontSize": 16,
+    "workbench.colorTheme": "Learn with Sumit - Professional",
+    "workbench.iconTheme": "material-icon-theme",
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 5000,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
