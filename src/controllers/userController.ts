@@ -80,8 +80,8 @@ export const login = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
   try {
- 
-    const decoded = jwt.decode(req.headers.token, process.env.JWT_PRIVATE_KEY );
+  
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_PRIVATE_KEY );
     if(!decoded){
       throw new Error("token is invalied!")
     }

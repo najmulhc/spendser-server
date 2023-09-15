@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createNewUser = void 0;
+exports.getUser = exports.login = exports.createNewUser = void 0;
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var userModels_1 = __importDefault(require("../models/userModels"));
 var mongoose_1 = require("mongoose");
@@ -71,7 +71,7 @@ var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 
                 userToken = jsonwebtoken_1.default.sign({
                     username: savedUser.username,
                     email: savedUser.email,
-                }, process.env.JWT_PRIVATE_KEY);
+                }, process.env.JWT_PRIVATE_KEY || "shh....");
                 return [2 /*return*/, res.json({
                         success: true,
                         token: userToken,
@@ -87,3 +87,83 @@ var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.createNewUser = createNewUser;
+var login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, credential, password, emailUser, usernameUser, user, correctPassword, userToken, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 4, , 5]);
+                _a = req.body, credential = _a.credential, password = _a.password;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        email: credential,
+                    })];
+            case 1:
+                emailUser = _b.sent();
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: credential,
+                    })];
+            case 2:
+                usernameUser = _b.sent();
+                user = emailUser || usernameUser;
+                console.log(user);
+                if (!user) {
+                    throw new mongoose_1.Error("User does not exists!");
+                }
+                return [4 /*yield*/, bcrypt_1.default.compare(password, user.hashedPassword)];
+            case 3:
+                correctPassword = _b.sent();
+                if (!correctPassword) {
+                    throw new mongoose_1.Error("Password is incorrect!");
+                }
+                userToken = jsonwebtoken_1.default.sign({
+                    username: user.username,
+                    email: user.email,
+                }, process.env.JWT_PRIVATE_KEY || "shh....");
+                res.json({
+                    success: true,
+                    user: user,
+                    token: userToken,
+                });
+                return [3 /*break*/, 5];
+            case 4:
+                error_2 = _b.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_2.message,
+                    })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.login = login;
+var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var decoded, username, user, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                decoded = jsonwebtoken_1.default.verify(req.headers.token, process.env.JWT_PRIVATE_KEY);
+                if (!decoded) {
+                    throw new mongoose_1.Error("token is invalied!");
+                }
+                username = decoded.username;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        user: user
+                    })];
+            case 2:
+                error_3 = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_3.message,
+                    })];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getUser = getUser;
