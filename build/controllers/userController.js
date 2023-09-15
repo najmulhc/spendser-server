@@ -44,6 +44,7 @@ var bcrypt_1 = __importDefault(require("bcrypt"));
 var userModels_1 = __importDefault(require("../models/userModels"));
 var mongoose_1 = require("mongoose");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+// creating new user
 var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, username, email, password, salt, hashedPassword, createdUser, savedUser, userToken, error_1;
     return __generator(this, function (_b) {
@@ -87,6 +88,7 @@ var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.createNewUser = createNewUser;
+// for handling login requests
 var login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, credential, password, emailUser, usernameUser, user, correctPassword, userToken, error_2;
     return __generator(this, function (_b) {
@@ -136,6 +138,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
     });
 }); };
 exports.login = login;
+// when you have jwt, you want to get the user account. 
 var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var decoded, username, user, error_3;
     return __generator(this, function (_a) {
@@ -153,7 +156,7 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
             case 1:
                 user = _a.sent();
                 return [2 /*return*/, res.json({
-                        success: false,
+                        success: true,
                         user: {
                             username: user.username,
                             email: user.email,

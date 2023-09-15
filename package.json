@@ -1,6 +1,6 @@
 {
   "name": "spendser-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The backend for personal money manager app called spendser ",
   "main": "app.js",
   "scripts": {

@@ -4,6 +4,7 @@ import User from "../models/userModels";
 import { Error } from "mongoose";
 import jwt from "jsonwebtoken";
 
+// creating new user
 export const createNewUser = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
@@ -39,6 +40,7 @@ export const createNewUser = async (req: Request, res: Response) => {
   }
 };
 
+// for handling login requests
 export const login = async (req: Request, res: Response) => {
   try {
     const { credential, password } = req.body;
@@ -48,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
     const usernameUser = await User.findOne({
       username: credential,
     });
-    const user: any = emailUser || usernameUser;
+    const user = emailUser || usernameUser;
     console.log(user);
     if (!user) {
       throw new Error("User does not exists!");
@@ -78,6 +80,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+// when you have jwt, you want to get the user account. 
 export const getUser = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
@@ -92,7 +95,7 @@ export const getUser = async (req: Request, res: Response) => {
     });
 
     return res.json({
-      success: false,
+      success: true,
       user: {
         username: user.username,
         email: user.email,
