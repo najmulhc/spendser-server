@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node ./build/app.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts", "build": "tsc"
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",

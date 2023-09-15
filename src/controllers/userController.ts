@@ -4,7 +4,7 @@ import User from "../models/userModels";
 import { Error } from "mongoose";
 import jwt from "jsonwebtoken";
 
-export const postUser = async (req: Request, res: Response) => {
+export const createNewUser = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
     const salt = await bcrypt.genSalt(12);
@@ -18,22 +18,84 @@ export const postUser = async (req: Request, res: Response) => {
       email,
       hashedPassword,
     });
-    // const savedUser = await createdUser.save();
-    const userToken = jwt.sign(
+    const savedUser = await createdUser.save();
+    const userToken: string = jwt.sign(
       {
-        username: createdUser.username,
-        email: createdUser.email,
+        username: savedUser.username,
+        email: savedUser.email,
       },
-      "7f9e2d8c6a5b1f3e0d9c8b7a6e5d4f2"
+      process.env.JWT_PRIVATE_KEY || "shh...."
     );
 
-    const decoded = jwt.verify(userToken, "7f9e2d8c6a5b1f3e0d9c8b7a6e5d4f2");
     return res.json({
       success: true,
       token: userToken,
-      user: createdUser,
-      decoded,
     });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { credential, password } = req.body;
+    const emailUser = await User.findOne({
+      email: credential,
+    });
+    const usernameUser = await User.findOne({
+      username: credential,
+    });
+    const user: any = emailUser || usernameUser;
+    console.log(user);
+    if (!user) {
+      throw new Error("User does not exists!");
+    }
+    const correctPassword = await bcrypt.compare(password, user.hashedPassword);
+    if (!correctPassword) {
+      throw new Error("Password is incorrect!");
+    }
+    const userToken: string = jwt.sign(
+      {
+        username: user.username,
+        email: user.email,
+      },
+      process.env.JWT_PRIVATE_KEY || "shh...."
+    );
+
+    res.json({
+      success: true,
+      user,
+      token: userToken,
+    });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+ 
+    const decoded = jwt.decode(req.headers.token, process.env.JWT_PRIVATE_KEY );
+    if(!decoded){
+      throw new Error("token is invalied!")
+    }
+
+    const {username} = decoded;
+    const user = await User.findOne({
+      username: username,
+    });
+
+    return res.json({
+      success: false, 
+      user
+    })
+
   } catch (error: any) {
     return res.json({
       success: false,

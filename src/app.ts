@@ -2,12 +2,15 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from 'dotenv'
 import userRouter from "./routes/userRouter";
+import connect from "./utils/connection";
 const app = express();
 const port = process.env.PORT || 6969;
 dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.use("/user", userRouter);
+
+connect();
 
 app.get("/", (req: Request, res: Response) => {
   return res.json({

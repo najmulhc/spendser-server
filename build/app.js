@@ -7,12 +7,14 @@ var express_1 = __importDefault(require("express"));
 var cors_1 = __importDefault(require("cors"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var userRouter_1 = __importDefault(require("./routes/userRouter"));
+var connection_1 = __importDefault(require("./utils/connection"));
 var app = (0, express_1.default)();
-var port = process.env.PORT || 5969;
+var port = process.env.PORT || 6969;
 dotenv_1.default.config();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use("/user", userRouter_1.default);
+(0, connection_1.default)();
 app.get("/", function (req, res) {
     return res.json({
         message: "Message from backend",

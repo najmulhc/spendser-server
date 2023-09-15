@@ -5,6 +5,7 @@ var userSchema = new mongoose_1.Schema({
     username: {
         type: String,
         required: [true, "We need an username."],
+        unique: true,
     },
     email: {
         type: String,
