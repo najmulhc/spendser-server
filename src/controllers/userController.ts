@@ -81,7 +81,7 @@ export const login = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
-    const decoded = jwt.verify(req.headers.token, process.env.JWT_PRIVATE_KEY); 
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_PRIVATE_KEY);
     if (!decoded) {
       throw new Error("token is invalied!");
     }
@@ -93,7 +93,10 @@ export const getUser = async (req: Request, res: Response) => {
 
     return res.json({
       success: false,
-      user,
+      user: {
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error: any) {
     return res.json({
