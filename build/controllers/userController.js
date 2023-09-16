@@ -157,10 +157,7 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
                 user = _a.sent();
                 return [2 /*return*/, res.json({
                         success: true,
-                        user: {
-                            username: user.username,
-                            email: user.email,
-                        },
+                        user: user._doc
                     })];
             case 2:
                 error_3 = _a.sent();

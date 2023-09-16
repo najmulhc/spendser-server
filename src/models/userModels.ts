@@ -4,6 +4,11 @@ interface UserType {
   username: string;
   hashedPassword: string;
   email: string;
+  account: {
+    balence: number, 
+    deposit: number ,
+    withdraw: number,
+  }
 }
 
 const userSchema = new Schema<UserType>({
@@ -19,7 +24,21 @@ const userSchema = new Schema<UserType>({
   hashedPassword: {
     type: String,
     required: [true, "Please enter password"],
-  },
+  }, 
+  account: {
+    balence: {
+      type: Number, 
+      default: 0
+    },
+    deposit: {
+      type: Number, 
+      default: 0
+    },
+    withdraw: {
+      type: Number, 
+      default: 0
+    },
+  }
 });
 
 const User = models.user || model<UserType>("user", userSchema);

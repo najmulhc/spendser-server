@@ -96,10 +96,7 @@ export const getUser = async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      user: {
-        username: user.username,
-        email: user.email,
-      },
+     user: user._doc
     });
   } catch (error: any) {
     return res.json({
