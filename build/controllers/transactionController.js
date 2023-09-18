@@ -64,6 +64,9 @@ var postTransaction = function (req, res) { return __awaiter(void 0, void 0, voi
                     user.account.balence -= parseInt(amount);
                     user.account.withdraw += parseInt(amount);
                 }
+                else {
+                    throw new Error("Transaction type is not valid!");
+                }
                 return [4 /*yield*/, userModels_1.default.findOneAndUpdate({ username: username }, user)];
             case 2:
                 savedUser = _b.sent();
@@ -72,7 +75,7 @@ var postTransaction = function (req, res) { return __awaiter(void 0, void 0, voi
                 resultUser = _b.sent();
                 return [2 /*return*/, res.json({
                         success: true,
-                        resultUser: resultUser,
+                        account: resultUser.account,
                     })];
             case 4:
                 error_1 = _b.sent();
