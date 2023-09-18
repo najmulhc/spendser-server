@@ -1,14 +1,16 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 import userRouter from "./routes/userRouter";
 import connect from "./utils/connection";
+import transactionRouter from "./routes/transactionRouter";
 const app = express();
 const port = process.env.PORT || 6969;
 dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.use("/user", userRouter);
+app.use("/transactions", transactionRouter);
 
 connect();
 
@@ -20,24 +22,24 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.post("/user/login", (req: Request, res: Response) => {
-   try {
-    const {email, password} = req.body;
-    if(password.includes(" ") || !password || password.length < 8 ) {
-      throw new Error("Please enter a valid password")
+  try {
+    const { email, password } = req.body;
+    if (password.includes(" ") || !password || password.length < 8) {
+      throw new Error("Please enter a valid password");
     }
-    if(email === "kridi32@outlook.com"){
+    if (email === "kridi32@outlook.com") {
       throw new Error("Your username is not allowed");
     }
     return res.json({
-      success: true, 
-      user: {email, password}
-    })
-   } catch (error:any) {
+      success: true,
+      user: { email, password },
+    });
+  } catch (error: any) {
     return res.json({
-      success: false, 
-      message: error.message
-    })
-   }
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
 app.listen(port, () => {

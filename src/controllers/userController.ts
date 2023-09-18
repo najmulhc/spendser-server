@@ -80,23 +80,21 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// when you have jwt, you want to get the user account. 
+// when you have jwt, you want to get the user account.
 export const getUser = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
-    const decoded = jwt.verify(req.headers.token, process.env.JWT_PRIVATE_KEY);
-    if (!decoded) {
-      throw new Error("token is invalied!");
-    }
-
-    const { username } = decoded;
+    const { username } = req.body;
     const user = await User.findOne({
       username: username,
     });
 
+    if(!user) {
+      throw new Error(`we did not find ${username}`)
+    }
+
     return res.json({
       success: true,
-     user: user._doc
+      user: user,
     });
   } catch (error: any) {
     return res.json({
