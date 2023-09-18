@@ -8,12 +8,14 @@ var cors_1 = __importDefault(require("cors"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var userRouter_1 = __importDefault(require("./routes/userRouter"));
 var connection_1 = __importDefault(require("./utils/connection"));
+var transactionRouter_1 = __importDefault(require("./routes/transactionRouter"));
 var app = (0, express_1.default)();
 var port = process.env.PORT || 6969;
 dotenv_1.default.config();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use("/user", userRouter_1.default);
+app.use("/transactions", transactionRouter_1.default);
 (0, connection_1.default)();
 app.get("/", function (req, res) {
     return res.json({
@@ -32,13 +34,13 @@ app.post("/user/login", function (req, res) {
         }
         return res.json({
             success: true,
-            user: { email: email, password: password }
+            user: { email: email, password: password },
         });
     }
     catch (error) {
         return res.json({
             success: false,
-            message: error.message
+            message: error.message,
         });
     }
 });

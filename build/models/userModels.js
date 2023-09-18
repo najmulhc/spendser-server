@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = require("mongoose");
+var transactionModel_1 = require("./transactionModel");
 var userSchema = new mongoose_1.Schema({
     username: {
         type: String,
@@ -18,17 +19,21 @@ var userSchema = new mongoose_1.Schema({
     account: {
         balence: {
             type: Number,
-            default: 0
+            default: 0,
         },
         deposit: {
             type: Number,
-            default: 0
+            default: 0,
         },
         withdraw: {
             type: Number,
-            default: 0
+            default: 0,
         },
-    }
+    },
+    transactions: {
+        type: [transactionModel_1.transactionSchema],
+        default: [],
+    },
 });
 var User = mongoose_1.models.user || (0, mongoose_1.model)("user", userSchema);
 exports.default = User;
