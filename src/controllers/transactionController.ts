@@ -32,3 +32,10 @@ export const postTransaction = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+// add a new resource, 
+
+// get resource 
+
+// delete a resource 
