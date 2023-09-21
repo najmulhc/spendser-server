@@ -110,9 +110,7 @@ export const postResource = async (req: Request, res: Response) => {
   try {
     // varify the user
     const { username, type, name } = req.body;
-    if (type !== "deposit" || type !== "withdraw") {
-      throw new Error("Invalid type of resource!");
-    }
+ 
 
     const user = await User.findOne({
       username: username,

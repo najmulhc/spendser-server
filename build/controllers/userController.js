@@ -178,9 +178,6 @@ var postResource = function (req, res) { return __awaiter(void 0, void 0, void 0
             case 0:
                 _b.trys.push([0, 4, , 5]);
                 _a = req.body, username = _a.username, type_1 = _a.type, name_1 = _a.name;
-                if (type_1 !== "deposit" || type_1 !== "withdraw") {
-                    throw new mongoose_1.Error("Invalid type of resource!");
-                }
                 return [4 /*yield*/, userModels_1.default.findOne({
                         username: username,
                     })];
