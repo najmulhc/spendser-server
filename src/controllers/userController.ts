@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import User from "../models/userModels";
 import { Error } from "mongoose";
 import jwt from "jsonwebtoken";
+import Resource, { ResourceType } from "../models/resourceModel";
 
 // creating new user
 export const createNewUser = async (req: Request, res: Response) => {
@@ -88,8 +89,8 @@ export const getUser = async (req: Request, res: Response) => {
       username: username,
     });
 
-    if(!user) {
-      throw new Error(`we did not find ${username}`)
+    if (!user) {
+      throw new Error(`we did not find ${username}`);
     }
 
     return res.json({
@@ -100,6 +101,92 @@ export const getUser = async (req: Request, res: Response) => {
     return res.json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+// add a new resource,
+export const postResource = async (req: Request, res: Response) => {
+  try {
+    // varify the user
+    const { username, type, name } = req.body;
+    if (type !== "deposit" || type !== "withdraw") {
+      throw new Error("Invalid type of resource!");
+    }
+
+    const user = await User.findOne({
+      username: username,
+    });
+
+    // create new resource
+    const newResource = new Resource({
+      name,
+      type: type,
+    });
+    //update the user with the new resource
+    user.resources.push(newResource);
+
+    const savedUser = await User.findOneAndUpdate({ username }, user);
+    const resultUser = await User.findOne({ username });
+
+    // return the resources with  the same type
+    return res.json({
+      success: true,
+      resources: resultUser.resources.filter(
+        (r: ResourceType) => r.type === type
+      ),
+    });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// get resource
+export const getResources = async (req: Request, res: Response) => {
+  try {
+    // varify the user
+    const { username } = req.body;
+    const user = await User.findOne({
+      username: username,
+    });
+    const type = req.query.type;
+    //@ts-ignore
+    if (type !== "deposit" || type !== "withdraw") {
+      throw new Error("Invalid type of resource!");
+    }
+
+    if (!user) {
+      throw new Error("user does not exist");
+    }
+    return res.json({
+      success: true,
+      resources: user.resources.filter(
+        (resource: ResourceType) => resource.type === type
+      ),
+    });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// delete a resource
+export const deleteResource = (req: Request, res: Response) => {
+  try {
+    // varify the user
+    // find the resource  (send the error if there is no resource)
+    // delete the resource
+    // delete transactions with the resources
+    // return the same resources without the deleted reriu
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: "the api is not ready",
     });
   }
 };

@@ -1,9 +1,6 @@
 import { Schema, models, model } from "mongoose";
 import { transactionSchema, transactionType } from "./transactionModel";
-import {
-  TransactionResourceSchema,
-  transactionResourceType,
-} from "./transactionResourceModel";
+import { ResourceType, resourceSchema } from "./resourceModel";
 
 interface UserType {
   username: string;
@@ -15,7 +12,7 @@ interface UserType {
     withdraw: number;
   };
   transactions: transactionType[];
-  resource: transactionResourceType[];
+  resources: ResourceType[];
 }
 
 const userSchema = new Schema<UserType>({
@@ -50,8 +47,8 @@ const userSchema = new Schema<UserType>({
     type: [transactionSchema],
     default: [],
   },
-  resource: {
-    type: [TransactionResourceSchema],
+  resources: {
+    type: [resourceSchema],
     default: [],
   },
 });

@@ -43,18 +43,22 @@ exports.postTransaction = void 0;
 var userModels_1 = __importDefault(require("../models/userModels"));
 var transactionModel_1 = __importDefault(require("../models/transactionModel"));
 var postTransaction = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, username, amount, type, user, transaction, savedUser, resultUser, error_1;
+    var _a, username, amount, type, resource, user, transaction, savedUser, resultUser, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _b.trys.push([0, 4, , 5]);
-                _a = req.body, username = _a.username, amount = _a.amount, type = _a.type;
+                _a = req.body, username = _a.username, amount = _a.amount, type = _a.type, resource = _a.resource;
                 return [4 /*yield*/, userModels_1.default.findOne({
                         username: username,
                     })];
             case 1:
                 user = _b.sent();
-                transaction = new transactionModel_1.default({ type: type, amount: parseInt(amount) });
+                transaction = new transactionModel_1.default({
+                    type: type,
+                    resource: resource,
+                    amount: parseInt(amount),
+                });
                 user.transactions.push(transaction);
                 if (type === "add") {
                     user.account.deposit += parseInt(amount);

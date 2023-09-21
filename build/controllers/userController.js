@@ -39,11 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = exports.login = exports.createNewUser = void 0;
+exports.deleteResource = exports.getResources = exports.postResource = exports.getUser = exports.login = exports.createNewUser = void 0;
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var userModels_1 = __importDefault(require("../models/userModels"));
 var mongoose_1 = require("mongoose");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var resourceModel_1 = __importDefault(require("../models/resourceModel"));
 // creating new user
 var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, username, email, password, salt, hashedPassword, createdUser, savedUser, userToken, error_1;
@@ -169,3 +170,100 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
     });
 }); };
 exports.getUser = getUser;
+// add a new resource,
+var postResource = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, username, type_1, name_1, user, newResource, savedUser, resultUser, error_4;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 4, , 5]);
+                _a = req.body, username = _a.username, type_1 = _a.type, name_1 = _a.name;
+                if (type_1 !== "deposit" || type_1 !== "withdraw") {
+                    throw new mongoose_1.Error("Invalid type of resource!");
+                }
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _b.sent();
+                newResource = new resourceModel_1.default({
+                    name: name_1,
+                    type: type_1,
+                });
+                //update the user with the new resource
+                user.resources.push(newResource);
+                return [4 /*yield*/, userModels_1.default.findOneAndUpdate({ username: username }, user)];
+            case 2:
+                savedUser = _b.sent();
+                return [4 /*yield*/, userModels_1.default.findOne({ username: username })];
+            case 3:
+                resultUser = _b.sent();
+                // return the resources with  the same type
+                return [2 /*return*/, res.json({
+                        success: true,
+                        resources: resultUser.resources.filter(function (r) { return r.type === type_1; }),
+                    })];
+            case 4:
+                error_4 = _b.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_4.message,
+                    })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.postResource = postResource;
+// get resource
+var getResources = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var username, user, type_2, error_5;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                username = req.body.username;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _a.sent();
+                type_2 = req.query.type;
+                //@ts-ignore
+                if (type_2 !== "deposit" || type_2 !== "withdraw") {
+                    throw new mongoose_1.Error("Invalid type of resource!");
+                }
+                if (!user) {
+                    throw new mongoose_1.Error("user does not exist");
+                }
+                return [2 /*return*/, res.json({
+                        success: true,
+                        resources: user.resources.filter(function (resource) { return resource.type === type_2; }),
+                    })];
+            case 2:
+                error_5 = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_5.message,
+                    })];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getResources = getResources;
+// delete a resource
+var deleteResource = function (req, res) {
+    try {
+        // varify the user
+        // find the resource  (send the error if there is no resource)
+        // delete the resource
+        // delete transactions with the resources
+        // return the same resources without the deleted reriu
+    }
+    catch (error) {
+        return res.json({
+            success: false,
+            message: "the api is not ready",
+        });
+    }
+};
+exports.deleteResource = deleteResource;

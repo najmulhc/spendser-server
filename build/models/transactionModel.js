@@ -25,9 +25,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transactionSchema = void 0;
 var mongoose_1 = __importStar(require("mongoose"));
+var resourceModel_1 = require("./resourceModel");
 exports.transactionSchema = new mongoose_1.default.Schema({
     amount: { type: Number, required: true },
     type: { type: String, enum: ["add", "spend"], required: true },
+    resourceType: {
+        type: resourceModel_1.resourceSchema,
+        required: [true, "what is the type of resource?"],
+    },
 });
 var Transaction = mongoose_1.models.transaction ||
     (0, mongoose_1.model)("transaction", exports.transactionSchema);

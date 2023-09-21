@@ -1,14 +1,19 @@
 import { Request, Response } from "express";
 import User from "../models/userModels";
 import Transaction from "../models/transactionModel";
+import varifyJWT from "../middlewares/varifyJWT";
 
 export const postTransaction = async (req: Request, res: Response) => {
   try {
-    const { username, amount, type } = req.body;
+    const { username, amount, type, resource } = req.body;
     const user = await User.findOne({
       username: username,
     });
-    const transaction = new Transaction({ type, amount: parseInt(amount) });
+    const transaction = new Transaction({
+      type,
+      resource,
+      amount: parseInt(amount),
+    });
     user.transactions.push(transaction);
     if (type === "add") {
       user.account.deposit += parseInt(amount);
@@ -17,7 +22,7 @@ export const postTransaction = async (req: Request, res: Response) => {
       user.account.balence -= parseInt(amount);
       user.account.withdraw += parseInt(amount);
     } else {
-      throw new Error("Transaction type is not valid!")
+      throw new Error("Transaction type is not valid!");
     }
     const savedUser = await User.findOneAndUpdate({ username }, user);
     const resultUser = await User.findOne({ username });
@@ -32,10 +37,3 @@ export const postTransaction = async (req: Request, res: Response) => {
     });
   }
 };
-
-
-// add a new resource, 
-
-// get resource 
-
-// delete a resource 

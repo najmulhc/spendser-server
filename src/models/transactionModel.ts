@@ -1,21 +1,20 @@
 import { Request } from "express";
 import mongoose, { model, models } from "mongoose";
 import {
-  TransactionResourceSchema,
-  transactionResourceType,
-} from "./transactionResourceModel";
+  resourceSchema, ResourceType, 
+} from "./resourceModel";
 
 export interface transactionType {
   amount: number;
   type: "add" | "spend";
-  resourceType: transactionResourceType;
+  resourceType: ResourceType;
 }
 
 export const transactionSchema = new mongoose.Schema<transactionType>({
   amount: { type: Number, required: true },
   type: { type: String, enum: ["add", "spend"], required: true },
   resourceType: {
-    type: TransactionResourceSchema,
+    type: resourceSchema,
     required: [true, "what is the type of resource?"],
   },
 });

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = require("mongoose");
 var transactionModel_1 = require("./transactionModel");
+var resourceModel_1 = require("./resourceModel");
 var userSchema = new mongoose_1.Schema({
     username: {
         type: String,
@@ -32,6 +33,10 @@ var userSchema = new mongoose_1.Schema({
     },
     transactions: {
         type: [transactionModel_1.transactionSchema],
+        default: [],
+    },
+    resources: {
+        type: [resourceModel_1.resourceSchema],
         default: [],
     },
 });

@@ -10,4 +10,7 @@ var userRouter = express_1.default.Router();
 userRouter.post("/sign-up", userController_1.createNewUser);
 userRouter.post("/login", userController_1.login);
 userRouter.get("/", varifyJWT_1.default, userController_1.getUser);
+userRouter.post("/resources", varifyJWT_1.default, userController_1.postResource);
+userRouter.get("/resources", varifyJWT_1.default, userController_1.getResources);
+userRouter.delete("/resources", varifyJWT_1.default, userController_1.deleteResource);
 exports.default = userRouter;
