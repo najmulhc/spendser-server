@@ -15,15 +15,7 @@ export const postTransaction = async (req: Request, res: Response) => {
       amount: parseInt(amount),
     });
     user.transactions.push(transaction);
-    if (type === "add") {
-      user.account.deposit += parseInt(amount);
-      user.account.balence += parseInt(amount);
-    } else if (type === "spend") {
-      user.account.balence -= parseInt(amount);
-      user.account.withdraw += parseInt(amount);
-    } else {
-      throw new Error("Transaction type is not valid!");
-    }
+ 
     const savedUser = await User.findOneAndUpdate({ username }, user);
     const resultUser = await User.findOne({ username });
     return res.json({

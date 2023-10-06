@@ -6,11 +6,7 @@ interface UserType {
   username: string;
   hashedPassword: string;
   email: string;
-  account: {
-    balence: number;
-    deposit: number;
-    withdraw: number;
-  };
+ 
   transactions: transactionType[];
   resources: ResourceType[];
 }
@@ -29,20 +25,7 @@ const userSchema = new Schema<UserType>({
     type: String,
     required: [true, "Please enter password"],
   },
-  account: {
-    balence: {
-      type: Number,
-      default: 0,
-    },
-    deposit: {
-      type: Number,
-      default: 0,
-    },
-    withdraw: {
-      type: Number,
-      default: 0,
-    },
-  },
+  
   transactions: {
     type: [transactionSchema],
     default: [],

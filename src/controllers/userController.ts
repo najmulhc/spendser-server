@@ -4,6 +4,7 @@ import User from "../models/userModels";
 import { Error } from "mongoose";
 import jwt from "jsonwebtoken";
 import Resource, { ResourceType } from "../models/resourceModel";
+import getAccount from "../lib/account";
 
 // creating new user
 export const createNewUser = async (req: Request, res: Response) => {
@@ -85,6 +86,7 @@ export const login = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
   try {
     const { username } = req.body;
+
     const user = await User.findOne({
       username: username,
     });
@@ -93,9 +95,13 @@ export const getUser = async (req: Request, res: Response) => {
       throw new Error(`we did not find ${username}`);
     }
 
+    const { transactions } = user;
+    const account = getAccount(transactions);
+
     return res.json({
       success: true,
-      user: user,
+      user,
+      account,
     });
   } catch (error: any) {
     return res.json({
@@ -110,11 +116,14 @@ export const postResource = async (req: Request, res: Response) => {
   try {
     // varify the user
     const { username, type, name } = req.body;
- 
 
     const user = await User.findOne({
       username: username,
     });
+
+    if (!name || name === " ") {
+      throw new Error("Resource name required!");
+    }
 
     // create new resource
     const newResource = new Resource({
@@ -151,10 +160,11 @@ export const getResources = async (req: Request, res: Response) => {
       username: username,
     });
     const type = req.query.type;
+
     //@ts-ignore
-    if (type !== "deposit" || type !== "withdraw") {
-      throw new Error("Invalid type of resource!");
-    }
+    // if (type !== "deposit" || type !== "withdraw") {
+    //   throw new Error("Invalid type of resource!");
+    // }
 
     if (!user) {
       throw new Error("user does not exist");
