@@ -118,11 +118,17 @@ export const postResource = async (req: Request, res: Response) => {
     const { username, type, name } = req.body;
 
     const user = await User.findOne({
-      username: username,
+      username,
     });
 
     if (!name || name === " ") {
       throw new Error("Resource name required!");
+    }
+    const foundResource = user.resources.filter(
+      (item: any) => item.name === name
+    );
+    if (foundResource[0]) {
+      throw new Error("The resource already exists!");
     }
 
     // create new resource
@@ -162,9 +168,9 @@ export const getResources = async (req: Request, res: Response) => {
     const type = req.query.type;
 
     //@ts-ignore
-    // if (type !== "deposit" || type !== "withdraw") {
-    //   throw new Error("Invalid type of resource!");
-    // }
+    if (type !==  ( "deposit"|| "withdraw")) {
+      throw new Error("Invalid type of resource!");
+    }
 
     if (!user) {
       throw new Error("user does not exist");

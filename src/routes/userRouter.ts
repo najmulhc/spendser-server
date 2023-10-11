@@ -9,7 +9,8 @@ userRouter.post("/login", login);
 userRouter.get("/",varifyJWT ,getUser);
 userRouter.post("/resources", varifyJWT, postResource);
 userRouter.get("/resources", varifyJWT, getResources);
-userRouter.delete("/resources", varifyJWT, deleteResource)
+userRouter.delete("/resources", varifyJWT, deleteResource);
+
 
 
 
