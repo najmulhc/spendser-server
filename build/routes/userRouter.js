@@ -13,4 +13,5 @@ userRouter.get("/", varifyJWT_1.default, userController_1.getUser);
 userRouter.post("/resources", varifyJWT_1.default, userController_1.postResource);
 userRouter.get("/resources", varifyJWT_1.default, userController_1.getResources);
 userRouter.delete("/resources", varifyJWT_1.default, userController_1.deleteResource);
+userRouter.get("/filtered", varifyJWT_1.default, userController_1.getFilteredResources);
 exports.default = userRouter;

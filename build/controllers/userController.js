@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteResource = exports.getResources = exports.postResource = exports.getUser = exports.login = exports.createNewUser = void 0;
+exports.getFilteredResources = exports.deleteResource = exports.getResources = exports.postResource = exports.getUser = exports.login = exports.createNewUser = void 0;
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var userModels_1 = __importDefault(require("../models/userModels"));
 var mongoose_1 = require("mongoose");
@@ -309,3 +309,52 @@ var deleteResource = function (req, res) { return __awaiter(void 0, void 0, void
     });
 }); };
 exports.deleteResource = deleteResource;
+// get the resource data
+var getFilteredResources = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var username, user, resources, transactions, data, _loop_1, _i, resources_1, resource, error_7;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                username = req.body.username;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _a.sent();
+                resources = user.resources, transactions = user.transactions;
+                data = [];
+                _loop_1 = function (resource) {
+                    var resourceTransctions = transactions.filter(function (transaction) {
+                        return transaction.resource.name === resource.name;
+                    });
+                    var resourceData = {
+                        name: resource.name,
+                        type: resource.type,
+                        total: 0,
+                    };
+                    for (var _b = 0, resourceTransctions_1 = resourceTransctions; _b < resourceTransctions_1.length; _b++) {
+                        var item = resourceTransctions_1[_b];
+                        resourceData.total += item.amount;
+                    }
+                    data.push(resourceData);
+                };
+                for (_i = 0, resources_1 = resources; _i < resources_1.length; _i++) {
+                    resource = resources_1[_i];
+                    _loop_1(resource);
+                }
+                return [2 /*return*/, res.json({
+                        success: true,
+                        resources: data,
+                    })];
+            case 2:
+                error_7 = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_7.message,
+                    })];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getFilteredResources = getFilteredResources;
