@@ -5,6 +5,7 @@ import { Error } from "mongoose";
 import jwt from "jsonwebtoken";
 import Resource, { ResourceType } from "../models/resourceModel";
 import getAccount from "../lib/account";
+import { transactionType } from "../models/transactionModel";
 
 // creating new user
 export const createNewUser = async (req: Request, res: Response) => {
@@ -211,7 +212,6 @@ export const getResources = async (req: Request, res: Response) => {
 // delete a resource
 export const deleteResource = async (req: Request, res: Response) => {
   try {
-    
     const { username, name, type } = req.body;
 
     const user = await User.findOne({
@@ -235,6 +235,45 @@ export const deleteResource = async (req: Request, res: Response) => {
           (resource: ResourceType) => resource.type === type
         ),
       },
+    });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// get the resource data
+
+export const getFilteredResources = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.body;
+    const user = await User.findOne({
+      username,
+    });
+    const { resources, transactions } = user;
+    const data = [];
+
+    for (let resource of resources) {
+      const resourceTransctions = transactions.filter(
+        (transaction: transactionType) =>
+          transaction.resource.name === resource.name
+      );
+      const resourceData = {
+        name: resource.name,
+        type: resource.type,
+        total: 0,
+      };
+      for (let item of resourceTransctions) {
+        resourceData.total += item.amount;
+      }
+      data.push(resourceData);
+    }
+
+    return res.json({
+      success: true,
+      resources: data,
     });
   } catch (error: any) {
     return res.json({

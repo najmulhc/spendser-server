@@ -66,7 +66,7 @@ export const getAllTransactions = async (req: Request, res: Response) => {
       throw new Error("user does not exists");
     }
 
-    const account = getAccount(user.transactions)
+    const account = getAccount(user.transactions);
 
     return res.json({
       success: true,
@@ -117,7 +117,6 @@ export const getLastTransactions = async (req: Request, res: Response) => {
       username,
     });
 
-
     const filteredTransactions = user.transactdions.filter(
       (transaction: transactionType) => transaction.time > lastTime
     );
@@ -136,3 +135,5 @@ export const getLastTransactions = async (req: Request, res: Response) => {
     });
   }
 };
+
+ 
