@@ -8,6 +8,7 @@ import getAccount from "../lib/account";
 export const postTransaction = async (req: Request, res: Response) => {
   try {
     const { username, amount, type, resource } = req.body;
+
     const user = await User.findOne({
       username: username,
     });
@@ -42,6 +43,7 @@ export const postTransaction = async (req: Request, res: Response) => {
 
     const savedUser = await User.findOneAndUpdate({ username }, user);
     const resultUser = await User.findOne({ username });
+ 
     return res.json({
       success: true,
       account: getAccount(resultUser.transactions),
