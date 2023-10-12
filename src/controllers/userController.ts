@@ -30,8 +30,15 @@ export const createNewUser = async (req: Request, res: Response) => {
       process.env.JWT_PRIVATE_KEY || "shh...."
     );
 
+    const account = getAccount(savedUser.transactions);
+
     return res.json({
       success: true,
+      user: {
+        username,
+        account,
+        resources: savedUser.resources,
+      },
       token: userToken,
     });
   } catch (error: any) {
@@ -53,7 +60,7 @@ export const login = async (req: Request, res: Response) => {
       username: credential,
     });
     const user = emailUser || usernameUser;
-    console.log(user);
+
     if (!user) {
       throw new Error("User does not exists!");
     }
@@ -61,6 +68,9 @@ export const login = async (req: Request, res: Response) => {
     if (!correctPassword) {
       throw new Error("Password is incorrect!");
     }
+
+    const account = getAccount(user.transactions);
+
     const userToken: string = jwt.sign(
       {
         username: user.username,
@@ -71,7 +81,11 @@ export const login = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      user,
+      user: {
+        username: user.username,
+        account,
+        resources: user.resources,
+      },
       token: userToken,
     });
   } catch (error: any) {
@@ -100,8 +114,11 @@ export const getUser = async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      user,
-      account,
+      user: {
+        username,
+        resources: user.resources,
+        account,
+      },
     });
   } catch (error: any) {
     return res.json({
@@ -110,6 +127,8 @@ export const getUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+// <- RESOURCE PART ->
 
 // add a new resource,
 export const postResource = async (req: Request, res: Response) => {
@@ -168,7 +187,7 @@ export const getResources = async (req: Request, res: Response) => {
     const type = req.query.type;
 
     //@ts-ignore
-    if (type !==  ( "deposit"|| "withdraw")) {
+    if (type !== ("deposit" || "withdraw")) {
       throw new Error("Invalid type of resource!");
     }
 
@@ -190,17 +209,38 @@ export const getResources = async (req: Request, res: Response) => {
 };
 
 // delete a resource
-export const deleteResource = (req: Request, res: Response) => {
+export const deleteResource = async (req: Request, res: Response) => {
   try {
     // varify the user
-    // find the resource  (send the error if there is no resource)
+    const { username, name, type } = req.body;
+    // find the resource  (send the error if there is no resource);
+    const user = await User.findOne({
+      username,
+    });
     // delete the resource
+    user.resources = user.resources.filter((item: any) => item.name !== name);
+
     // delete transactions with the resources
+    user.transactions = user.transactions.filter(
+      (item: any) => item.resource.name !== name
+    );
     // return the same resources without the deleted reriu
-  } catch (error) {
+    const savedUser = await user.save();
+    const account = getAccount(savedUser.transactions);
+
+    return res.json({
+      success: true,
+      user: {
+        account,
+        resources: savedUser.resources.filter(
+          (resource: ResourceType) => resource.type === type
+        ),
+      },
+    });
+  } catch (error: any) {
     return res.json({
       success: false,
-      message: "the api is not ready",
+      message: error.message,
     });
   }
 };
