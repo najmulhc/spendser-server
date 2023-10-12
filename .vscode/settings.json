@@ -1,7 +1,7 @@
 {
-  "editor.fontFamily": "OPERATOR MONO",
+  "editor.fontFamily": "Operator Mono",
   "editor.fontSize": 16,
-  "workbench.colorTheme": "Learn with Sumit - Professional",
+  "workbench.colorTheme": "Serendipity Midnight",
   "workbench.iconTheme": "material-icon-theme",
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 5000,

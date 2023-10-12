@@ -1,20 +1,22 @@
-const getAccount = (transactions:any) => {
-    const account = {
-      balence: 0,
-      deposit: 0,
-      withdraw: 0,
-    };
+import { transactionType } from "../models/transactionModel";
 
-     for (let transaction of transactions) {
-       if (transaction.type === "deposit") {
-         account.deposit += transaction.amount;
-       } else {
-         account.withdraw += transaction.amount;
-       }
-     }
-     account.balence = account.deposit - account.withdraw;
+const getAccount = (transactions: transactionType[]) => {
+  const account = {
+    balence: 0,
+    deposit: 0,
+    withdraw: 0,
+  };
 
-    return account;
-}
+  for (let transaction of transactions) {
+    if (transaction.type === "deposit") {
+      account.deposit += transaction.amount;
+    } else {
+      account.withdraw += transaction.amount;
+    }
+  }
+  account.balence = account.deposit - account.withdraw;
+
+  return account;
+};
 
 export default getAccount;

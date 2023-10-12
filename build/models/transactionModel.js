@@ -28,10 +28,14 @@ var mongoose_1 = __importStar(require("mongoose"));
 var resourceModel_1 = require("./resourceModel");
 exports.transactionSchema = new mongoose_1.default.Schema({
     amount: { type: Number, required: true },
-    type: { type: String, enum: ["add", "spend"], required: true },
-    resourceType: {
+    type: { type: String, enum: ["deposit", "withdraw"], required: true },
+    resource: {
         type: resourceModel_1.resourceSchema,
         required: [true, "what is the type of resource?"],
+    },
+    time: {
+        type: Number,
+        required: [true, "When you did the transaction?"],
     },
 });
 var Transaction = mongoose_1.models.transaction ||

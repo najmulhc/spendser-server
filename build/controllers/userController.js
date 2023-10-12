@@ -45,9 +45,10 @@ var userModels_1 = __importDefault(require("../models/userModels"));
 var mongoose_1 = require("mongoose");
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var resourceModel_1 = __importDefault(require("../models/resourceModel"));
+var account_1 = __importDefault(require("../lib/account"));
 // creating new user
 var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, username, email, password, salt, hashedPassword, createdUser, savedUser, userToken, error_1;
+    var _a, username, email, password, salt, hashedPassword, createdUser, savedUser, userToken, account, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -74,8 +75,14 @@ var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 
                     username: savedUser.username,
                     email: savedUser.email,
                 }, process.env.JWT_PRIVATE_KEY || "shh....");
+                account = (0, account_1.default)(savedUser.transactions);
                 return [2 /*return*/, res.json({
                         success: true,
+                        user: {
+                            username: username,
+                            account: account,
+                            resources: savedUser.resources,
+                        },
                         token: userToken,
                     })];
             case 4:
@@ -91,7 +98,7 @@ var createNewUser = function (req, res) { return __awaiter(void 0, void 0, void 
 exports.createNewUser = createNewUser;
 // for handling login requests
 var login = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, credential, password, emailUser, usernameUser, user, correctPassword, userToken, error_2;
+    var _a, credential, password, emailUser, usernameUser, user, correctPassword, account, userToken, error_2;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -108,7 +115,6 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
             case 2:
                 usernameUser = _b.sent();
                 user = emailUser || usernameUser;
-                console.log(user);
                 if (!user) {
                     throw new mongoose_1.Error("User does not exists!");
                 }
@@ -118,13 +124,18 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                 if (!correctPassword) {
                     throw new mongoose_1.Error("Password is incorrect!");
                 }
+                account = (0, account_1.default)(user.transactions);
                 userToken = jsonwebtoken_1.default.sign({
                     username: user.username,
                     email: user.email,
                 }, process.env.JWT_PRIVATE_KEY || "shh....");
                 res.json({
                     success: true,
-                    user: user,
+                    user: {
+                        username: user.username,
+                        account: account,
+                        resources: user.resources,
+                    },
                     token: userToken,
                 });
                 return [3 /*break*/, 5];
@@ -141,7 +152,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
 exports.login = login;
 // when you have jwt, you want to get the user account.
 var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, user, error_3;
+    var username, user, transactions, account, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -155,9 +166,15 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
                 if (!user) {
                     throw new mongoose_1.Error("we did not find ".concat(username));
                 }
+                transactions = user.transactions;
+                account = (0, account_1.default)(transactions);
                 return [2 /*return*/, res.json({
                         success: true,
-                        user: user,
+                        user: {
+                            username: username,
+                            resources: user.resources,
+                            account: account,
+                        },
                     })];
             case 2:
                 error_3 = _a.sent();
@@ -170,9 +187,10 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
     });
 }); };
 exports.getUser = getUser;
+// <- RESOURCE PART ->
 // add a new resource,
 var postResource = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, username, type_1, name_1, user, newResource, savedUser, resultUser, error_4;
+    var _a, username, type_1, name_1, user, foundResource, newResource, savedUser, resultUser, error_4;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -183,6 +201,13 @@ var postResource = function (req, res) { return __awaiter(void 0, void 0, void 0
                     })];
             case 1:
                 user = _b.sent();
+                if (!name_1 || name_1 === " ") {
+                    throw new mongoose_1.Error("Resource name required!");
+                }
+                foundResource = user.resources.filter(function (item) { return item.name === name_1; });
+                if (foundResource[0]) {
+                    throw new mongoose_1.Error("The resource already exists!");
+                }
                 newResource = new resourceModel_1.default({
                     name: name_1,
                     type: type_1,
@@ -226,7 +251,7 @@ var getResources = function (req, res) { return __awaiter(void 0, void 0, void 0
                 user = _a.sent();
                 type_2 = req.query.type;
                 //@ts-ignore
-                if (type_2 !== "deposit" || type_2 !== "withdraw") {
+                if (type_2 !== ("deposit" || "withdraw")) {
                     throw new mongoose_1.Error("Invalid type of resource!");
                 }
                 if (!user) {
@@ -248,19 +273,39 @@ var getResources = function (req, res) { return __awaiter(void 0, void 0, void 0
 }); };
 exports.getResources = getResources;
 // delete a resource
-var deleteResource = function (req, res) {
-    try {
-        // varify the user
-        // find the resource  (send the error if there is no resource)
-        // delete the resource
-        // delete transactions with the resources
-        // return the same resources without the deleted reriu
-    }
-    catch (error) {
-        return res.json({
-            success: false,
-            message: "the api is not ready",
-        });
-    }
-};
+var deleteResource = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, username, name_2, type_3, user, savedUser, account, error_6;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 3, , 4]);
+                _a = req.body, username = _a.username, name_2 = _a.name, type_3 = _a.type;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _b.sent();
+                user.resources = user.resources.filter(function (item) { return item.name !== name_2; });
+                user.transactions = user.transactions.filter(function (item) { return item.resource.name !== name_2; });
+                return [4 /*yield*/, user.save()];
+            case 2:
+                savedUser = _b.sent();
+                account = (0, account_1.default)(savedUser.transactions);
+                return [2 /*return*/, res.json({
+                        success: true,
+                        user: {
+                            account: account,
+                            resources: savedUser.resources.filter(function (resource) { return resource.type === type_3; }),
+                        },
+                    })];
+            case 3:
+                error_6 = _b.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_6.message,
+                    })];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
 exports.deleteResource = deleteResource;

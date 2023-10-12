@@ -211,20 +211,19 @@ export const getResources = async (req: Request, res: Response) => {
 // delete a resource
 export const deleteResource = async (req: Request, res: Response) => {
   try {
-    // varify the user
+    
     const { username, name, type } = req.body;
-    // find the resource  (send the error if there is no resource);
+
     const user = await User.findOne({
       username,
     });
-    // delete the resource
+
     user.resources = user.resources.filter((item: any) => item.name !== name);
 
-    // delete transactions with the resources
     user.transactions = user.transactions.filter(
       (item: any) => item.resource.name !== name
     );
-    // return the same resources without the deleted reriu
+
     const savedUser = await user.save();
     const account = getAccount(savedUser.transactions);
 

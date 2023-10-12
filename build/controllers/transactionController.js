@@ -39,38 +39,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postTransaction = void 0;
+exports.getLastTransactions = exports.getAllTransactions = exports.postTransaction = void 0;
 var userModels_1 = __importDefault(require("../models/userModels"));
 var transactionModel_1 = __importDefault(require("../models/transactionModel"));
+var account_1 = __importDefault(require("../lib/account"));
 var postTransaction = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, username, amount, type, resource, user, transaction, savedUser, resultUser, error_1;
+    var _a, username, amount, type_1, resource_1, user, userResource, time, transaction, savedUser, resultUser, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _b.trys.push([0, 4, , 5]);
-                _a = req.body, username = _a.username, amount = _a.amount, type = _a.type, resource = _a.resource;
+                _a = req.body, username = _a.username, amount = _a.amount, type_1 = _a.type, resource_1 = _a.resource;
                 return [4 /*yield*/, userModels_1.default.findOne({
                         username: username,
                     })];
             case 1:
                 user = _b.sent();
+                if (!amount || !type_1 || !resource_1) {
+                    throw new Error("Invalid transaction input");
+                }
+                if (!user.resources.filter(function (item) { return item.type === type_1; })) {
+                    throw new Error("No Resource found. Please add a resource before adding transactions.");
+                }
+                userResource = user.resources.filter(function (item) { return item.name === resource_1; });
+                if (!userResource[0]) {
+                    throw new Error("Resource \" ".concat(resource_1, " \" does not exist to the user!"));
+                }
+                if (userResource[0].type !== type_1) {
+                    return [2 /*return*/, new Error("".concat(userResource.name, " is not a ").concat(type_1, " type."))];
+                }
+                time = new Date().getTime();
                 transaction = new transactionModel_1.default({
-                    type: type,
-                    resource: resource,
+                    type: type_1,
+                    resource: userResource[0],
                     amount: parseInt(amount),
+                    time: time,
                 });
                 user.transactions.push(transaction);
-                if (type === "add") {
-                    user.account.deposit += parseInt(amount);
-                    user.account.balence += parseInt(amount);
-                }
-                else if (type === "spend") {
-                    user.account.balence -= parseInt(amount);
-                    user.account.withdraw += parseInt(amount);
-                }
-                else {
-                    throw new Error("Transaction type is not valid!");
-                }
                 return [4 /*yield*/, userModels_1.default.findOneAndUpdate({ username: username }, user)];
             case 2:
                 savedUser = _b.sent();
@@ -79,7 +84,7 @@ var postTransaction = function (req, res) { return __awaiter(void 0, void 0, voi
                 resultUser = _b.sent();
                 return [2 /*return*/, res.json({
                         success: true,
-                        account: resultUser.account,
+                        account: (0, account_1.default)(resultUser.transactions),
                     })];
             case 4:
                 error_1 = _b.sent();
@@ -92,3 +97,86 @@ var postTransaction = function (req, res) { return __awaiter(void 0, void 0, voi
     });
 }); };
 exports.postTransaction = postTransaction;
+// for getting all the transactions of the user
+var getAllTransactions = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var username, user, account, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                username = req.body.username;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _a.sent();
+                if (!user.username) {
+                    throw new Error("user does not exists");
+                }
+                account = (0, account_1.default)(user.transactions);
+                return [2 /*return*/, res.json({
+                        success: true,
+                        transactions: user.transactions,
+                    })];
+            case 2:
+                error_2 = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_2.message,
+                    })];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getAllTransactions = getAllTransactions;
+// get transaction info of last 1 day, 1 week, 1 month
+var getLastTransactions = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var username, timeSpan, currentTime, lastTime_1, user, filteredTransactions, account, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                username = req.body.username;
+                timeSpan = req.params.timeSpan;
+                currentTime = new Date().getTime();
+                lastTime_1 = currentTime;
+                switch (timeSpan) {
+                    case "day":
+                        lastTime_1 -= 86400000;
+                        break;
+                    case "week":
+                        lastTime_1 -= 604800000;
+                        break;
+                    case "month":
+                        lastTime_1 -= 30.44 * 24 * 60 * 60 * 1000;
+                        break;
+                    case "thisMonth":
+                        lastTime_1 = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+                        break;
+                    default:
+                        lastTime_1 = currentTime;
+                        break;
+                }
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _a.sent();
+                filteredTransactions = user.transactdions.filter(function (transaction) { return transaction.time > lastTime_1; });
+                account = (0, account_1.default)(filteredTransactions);
+                return [2 /*return*/, res.json({
+                        success: true,
+                        transactions: filteredTransactions,
+                        account: account,
+                    })];
+            case 2:
+                error_3 = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_3.message,
+                    })];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getLastTransactions = getLastTransactions;

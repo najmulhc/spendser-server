@@ -17,20 +17,6 @@ var userSchema = new mongoose_1.Schema({
         type: String,
         required: [true, "Please enter password"],
     },
-    account: {
-        balence: {
-            type: Number,
-            default: 0,
-        },
-        deposit: {
-            type: Number,
-            default: 0,
-        },
-        withdraw: {
-            type: Number,
-            default: 0,
-        },
-    },
     transactions: {
         type: [transactionModel_1.transactionSchema],
         default: [],
