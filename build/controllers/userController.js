@@ -359,52 +359,56 @@ var getFilteredResources = function (req, res) { return __awaiter(void 0, void 0
 }); };
 exports.getFilteredResources = getFilteredResources;
 var resourcesThisMonth = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, user, transactions, resources, date, firstOfThisMonth_1, filteredTransactions, monthAccount, data, _loop_2, _i, resources_2, resource;
+    var username, user, transactions, resources, date, firstOfThisMonth_1, filteredTransactions, monthAccount, data, _loop_2, _i, resources_2, resource, error_8;
     return __generator(this, function (_a) {
-        try {
-            username = req.body.username;
-            user = userModels_1.default.findOne({
-                username: username,
-            });
-            transactions = user.transactions, resources = user.resources;
-            date = new Date();
-            firstOfThisMonth_1 = new Date(date.getFullYear(), date.getMonth(), 1)
-                .getTime;
-            filteredTransactions = transactions.filter(function (itme) { return itme.time > firstOfThisMonth_1; });
-            monthAccount = (0, account_1.default)(filteredTransactions);
-            data = [];
-            _loop_2 = function (resource) {
-                var resourceTransctions = filteredTransactions.filter(function (transaction) {
-                    return transaction.resource.name === resource.name;
-                });
-                var resourceData = {
-                    name: resource.name,
-                    type: resource.type,
-                    total: 0,
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                username = req.body.username;
+                return [4 /*yield*/, userModels_1.default.findOne({
+                        username: username,
+                    })];
+            case 1:
+                user = _a.sent();
+                transactions = user.transactions, resources = user.resources;
+                date = new Date();
+                firstOfThisMonth_1 = new Date(date.getFullYear(), date.getMonth(), 1)
+                    .getTime();
+                filteredTransactions = transactions.filter(function (itme) { return itme.time > firstOfThisMonth_1; });
+                monthAccount = (0, account_1.default)(filteredTransactions);
+                data = [];
+                _loop_2 = function (resource) {
+                    var resourceTransctions = filteredTransactions.filter(function (transaction) {
+                        return transaction.resource.name === resource.name;
+                    });
+                    var resourceData = {
+                        name: resource.name,
+                        type: resource.type,
+                        total: 0,
+                    };
+                    for (var _b = 0, resourceTransctions_2 = resourceTransctions; _b < resourceTransctions_2.length; _b++) {
+                        var item = resourceTransctions_2[_b];
+                        resourceData.total += item.amount;
+                    }
+                    data.push(resourceData);
                 };
-                for (var _b = 0, resourceTransctions_2 = resourceTransctions; _b < resourceTransctions_2.length; _b++) {
-                    var item = resourceTransctions_2[_b];
-                    resourceData.total += item.amount;
+                for (_i = 0, resources_2 = resources; _i < resources_2.length; _i++) {
+                    resource = resources_2[_i];
+                    _loop_2(resource);
                 }
-                data.push(resourceData);
-            };
-            for (_i = 0, resources_2 = resources; _i < resources_2.length; _i++) {
-                resource = resources_2[_i];
-                _loop_2(resource);
-            }
-            return [2 /*return*/, res.json({
-                    success: true,
-                    account: monthAccount,
-                    resources: data,
-                })];
+                return [2 /*return*/, res.json({
+                        success: true,
+                        account: monthAccount,
+                        resources: data,
+                    })];
+            case 2:
+                error_8 = _a.sent();
+                return [2 /*return*/, res.json({
+                        success: false,
+                        message: error_8.message,
+                    })];
+            case 3: return [2 /*return*/];
         }
-        catch (error) {
-            return [2 /*return*/, res.json({
-                    success: false,
-                    message: error.message,
-                })];
-        }
-        return [2 /*return*/];
     });
 }); };
 exports.resourcesThisMonth = resourcesThisMonth;

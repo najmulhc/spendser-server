@@ -287,14 +287,14 @@ export const resourcesThisMonth = async (req: Request, res: Response) => {
   try {
     const { username } = req.body;
 
-    const user: any = User.findOne({
+    const user: any = await User.findOne({
       username,
     });
 
     const { transactions, resources } = user;
     const date = new Date();
     const firstOfThisMonth = new Date(date.getFullYear(), date.getMonth(), 1)
-      .getTime;
+      .getTime();
 
     const filteredTransactions = transactions.filter(
       (itme: any) => itme.time > firstOfThisMonth
