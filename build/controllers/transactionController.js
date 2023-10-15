@@ -44,18 +44,18 @@ var userModels_1 = __importDefault(require("../models/userModels"));
 var transactionModel_1 = __importDefault(require("../models/transactionModel"));
 var account_1 = __importDefault(require("../lib/account"));
 var postTransaction = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, username, amount, type_1, resource_1, user, userResource, time, transaction, savedUser, resultUser, error_1;
+    var _a, username, amount, type_1, resource_1, description, user, userResource, time, transaction, savedUser, resultUser, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _b.trys.push([0, 4, , 5]);
-                _a = req.body, username = _a.username, amount = _a.amount, type_1 = _a.type, resource_1 = _a.resource;
+                _a = req.body, username = _a.username, amount = _a.amount, type_1 = _a.type, resource_1 = _a.resource, description = _a.description;
                 return [4 /*yield*/, userModels_1.default.findOne({
                         username: username,
                     })];
             case 1:
                 user = _b.sent();
-                if (!amount || !type_1 || !resource_1) {
+                if (!amount || !type_1 || !resource_1 || !description) {
                     throw new Error("Invalid transaction input");
                 }
                 if (!user.resources.filter(function (item) { return item.type === type_1; })) {
@@ -74,6 +74,7 @@ var postTransaction = function (req, res) { return __awaiter(void 0, void 0, voi
                     resource: userResource[0],
                     amount: parseInt(amount),
                     time: time,
+                    description: description
                 });
                 user.transactions.push(transaction);
                 return [4 /*yield*/, userModels_1.default.findOneAndUpdate({ username: username }, user)];

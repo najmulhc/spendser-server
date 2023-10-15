@@ -37,6 +37,11 @@ exports.transactionSchema = new mongoose_1.default.Schema({
         type: Number,
         required: [true, "When you did the transaction?"],
     },
+    description: {
+        type: String, required: [
+            true, "We need the description for the transaction."
+        ]
+    }
 });
 var Transaction = mongoose_1.models.transaction ||
     (0, mongoose_1.model)("transaction", exports.transactionSchema);

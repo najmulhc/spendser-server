@@ -7,12 +7,12 @@ import getAccount from "../lib/account";
 
 export const postTransaction = async (req: Request, res: Response) => {
   try {
-    const { username, amount, type, resource } = req.body;
+    const { username, amount, type, resource, description } = req.body;
 
     const user = await User.findOne({
       username: username,
     });
-    if (!amount || !type || !resource) {
+    if (!amount || !type || !resource || !description) {
       throw new Error("Invalid transaction input");
     }
 
@@ -36,8 +36,9 @@ export const postTransaction = async (req: Request, res: Response) => {
     const transaction = new Transaction({
       type,
       resource: userResource[0],
-      amount: parseInt(amount),
+      amount: parseInt(amount), 
       time,
+      description
     });
     user.transactions.push(transaction);
 

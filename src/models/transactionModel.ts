@@ -8,6 +8,7 @@ export interface transactionType {
   type: "deposit" | "withdraw";
   resource: ResourceType;
   time: number;
+  description: string,
 }
 
 export const transactionSchema = new mongoose.Schema<transactionType>({
@@ -21,6 +22,11 @@ export const transactionSchema = new mongoose.Schema<transactionType>({
     type: Number,
     required: [true, "When you did the transaction?"],
   },
+  description: {
+    type: String, required: [
+      true, "We need the description for the transaction."
+    ]
+  }
 });
 
 const Transaction =
