@@ -7,6 +7,7 @@ import {
   getUser,
   login,
   postResource,
+  resourcesThisMonth,
 } from "../controllers/userController";
 import varifyJWT from "../middlewares/varifyJWT";
 
@@ -19,5 +20,6 @@ userRouter.post("/resources", varifyJWT, postResource);
 userRouter.get("/resources", varifyJWT, getResources);
 userRouter.delete("/resources", varifyJWT, deleteResource);
 userRouter.get("/filtered", varifyJWT, getFilteredResources);
+userRouter.get("/this-month", varifyJWT, resourcesThisMonth);
 
 export default userRouter;

@@ -14,4 +14,5 @@ userRouter.post("/resources", varifyJWT_1.default, userController_1.postResource
 userRouter.get("/resources", varifyJWT_1.default, userController_1.getResources);
 userRouter.delete("/resources", varifyJWT_1.default, userController_1.deleteResource);
 userRouter.get("/filtered", varifyJWT_1.default, userController_1.getFilteredResources);
+userRouter.get("/this-month", varifyJWT_1.default, userController_1.resourcesThisMonth);
 exports.default = userRouter;

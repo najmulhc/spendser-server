@@ -282,3 +282,52 @@ export const getFilteredResources = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const resourcesThisMonth = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.body;
+
+    const user: any = User.findOne({
+      username,
+    });
+
+    const { transactions, resources } = user;
+    const date = new Date();
+    const firstOfThisMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+      .getTime;
+
+    const filteredTransactions = transactions.filter(
+      (itme: any) => itme.time > firstOfThisMonth
+    );
+    const monthAccount = getAccount(filteredTransactions);
+
+    const data = [];
+
+    for (let resource of resources) {
+      const resourceTransctions = filteredTransactions.filter(
+        (transaction: transactionType) =>
+          transaction.resource.name === resource.name
+      );
+      const resourceData = {
+        name: resource.name,
+        type: resource.type,
+        total: 0,
+      };
+      for (let item of resourceTransctions) {
+        resourceData.total += item.amount;
+      }
+      data.push(resourceData);
+    }
+
+    return res.json({
+      success: true,
+      account: monthAccount,
+      resources: data,
+    });
+  } catch (error: any) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
